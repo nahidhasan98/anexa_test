@@ -189,7 +189,7 @@ This api call returns a `json` data as response in the following format:
 {
     "status": "success",
     "id": "6101de8414805648138fce47",
-    "message": "Order sucseccfully placed. Order id: 6101de8414805648138fce47"
+    "message": "Order successfully placed. Order id: 6101de8414805648138fce47"
 }
 ```
 
