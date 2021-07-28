@@ -146,18 +146,24 @@ func DeleteItemFromCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//preparing data for json response
-	returnData := struct {
+	type returnData struct {
 		Status  string `json:"status"`
-		ID      string `json:"id"`
+		ID      string `json:"id,omitempty"`
 		Message string `json:"message"`
-	}{
-		Status:  "success",
-		ID:      id,
-		Message: "Item successfully deleted from cart. Total item deleted: " + fmt.Sprintf("%d", res.DeletedCount),
+	}
+	var responseData returnData
+
+	if res.DeletedCount == 0 {
+		responseData.Status = "error"
+		responseData.Message = "No Product Found with ID: " + id
+	} else {
+		responseData.Status = "success"
+		responseData.ID = id
+		responseData.Message = "Item successfully deleted from cart. Total item deleted: " + fmt.Sprintf("%d", res.DeletedCount)
 	}
 
 	//encoding data to json
-	rData, err := json.Marshal(returnData)
+	rData, err := json.Marshal(responseData)
 	if err != nil {
 		fmt.Println(err)
 	}
