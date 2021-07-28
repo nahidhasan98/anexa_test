@@ -32,3 +32,10 @@ type Order struct {
 	Items []Item             `json:"items" bson:"items"`
 	Total float64            `json:"total" bson:"total"`
 }
+
+//ResponseData for holding a api response details
+type ResponseData struct {
+	Status  string `json:"status"`
+	ID      string `json:"id,omitempty"`
+	Message string `json:"message"`
+}
