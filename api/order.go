@@ -45,25 +45,27 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		orderData.Items = append(orderData.Items, temp) //finally taking this single item to the slice of items
 	}
 
-	//got item(s) from cart
-	//now inserting order (document/row) to DB
-	res, err := orderColl.InsertOne(ctx, orderData)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	//getting inserted id as string from the result of insert query to DB
-	insertedID := res.InsertedID.(primitive.ObjectID).Hex() //type assertion && Calling Hex func
+	//got item(s) from cart, now checking if the cart is epty or not
 
 	//preparing data for json response
-	returnData := struct {
-		Status  string `json:"status"`
-		ID      string `json:"id"`
-		Message string `json:"message"`
-	}{
-		Status:  "success",
-		ID:      insertedID,
-		Message: "Order sucseccfully placed. Order id: " + insertedID,
+	var returnData model.ResponseData
+
+	if orderData.Items == nil { //if the cart is empty
+		returnData.Status = "error"
+		returnData.Message = "No product found in the cart. Cart is empty."
+	} else { //got some item(s) in the cart
+		//now inserting order (document/row) to DB
+		res, err := orderColl.InsertOne(ctx, orderData)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		//getting inserted id as string from the result of insert query to DB
+		insertedID := res.InsertedID.(primitive.ObjectID).Hex() //type assertion && Calling Hex func
+
+		returnData.Status = "success"
+		returnData.ID = insertedID
+		returnData.Message = "Order sucseccfully placed. Order id: " + insertedID
 	}
 
 	//encoding data to json
