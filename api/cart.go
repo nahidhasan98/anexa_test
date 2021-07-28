@@ -36,7 +36,7 @@ func GetCartInfo(w http.ResponseWriter, r *http.Request) {
 	//getting multiple documents(rows)
 	//Iterating through the cursor allows us to decode one document at a time
 	for cursor.Next(ctx) {
-		//creating a tempory variable in which the single document can be decoded
+		//creating a temporary variable in which the single document can be decoded
 		var temp model.Item
 		err := cursor.Decode(&temp)
 		if err != nil {
