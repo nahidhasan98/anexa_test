@@ -99,11 +99,7 @@ func AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	insertedID := res.InsertedID.(primitive.ObjectID).Hex() //type assertion && Calling Hex func
 
 	//preparing data for json response
-	returnData := struct {
-		Status  string `json:"status"`
-		ID      string `json:"id"`
-		Message string `json:"message"`
-	}{
+	returnData := model.ResponseData{
 		Status:  "success",
 		ID:      insertedID,
 		Message: "Item successfully added to cart. Inserted id: " + insertedID,
@@ -146,24 +142,19 @@ func DeleteItemFromCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//preparing data for json response
-	type returnData struct {
-		Status  string `json:"status"`
-		ID      string `json:"id,omitempty"`
-		Message string `json:"message"`
-	}
-	var responseData returnData
+	var returnData model.ResponseData
 
-	if res.DeletedCount == 0 {
-		responseData.Status = "error"
-		responseData.Message = "No Product Found with ID: " + id
-	} else {
-		responseData.Status = "success"
-		responseData.ID = id
-		responseData.Message = "Item successfully deleted from cart. Total item deleted: " + fmt.Sprintf("%d", res.DeletedCount)
+	if res.DeletedCount == 0 { //if no item found with the provided id
+		returnData.Status = "error"
+		returnData.Message = "No product found with ID: " + id
+	} else { //if item found
+		returnData.Status = "success"
+		returnData.ID = id
+		returnData.Message = "Item successfully deleted from cart. Total item deleted: " + fmt.Sprintf("%d", res.DeletedCount)
 	}
 
 	//encoding data to json
-	rData, err := json.Marshal(responseData)
+	rData, err := json.Marshal(returnData)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -189,12 +180,14 @@ func ResetCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//preparing data for json response
-	returnData := struct {
-		Status  string `json:"status"`
-		Message string `json:"message"`
-	}{
-		Status:  "success",
-		Message: "All item(s) successfully deleted from cart. Total item(s) deleted: " + fmt.Sprintf("%d", res.DeletedCount),
+	var returnData model.ResponseData
+
+	if res.DeletedCount == 0 { //if cart is empty
+		returnData.Status = "error"
+		returnData.Message = "No product found. Cart is already empty."
+	} else { //got some item(s) in the cart and deleted
+		returnData.Status = "success"
+		returnData.Message = "All item(s) successfully deleted from cart. Total item(s) deleted: " + fmt.Sprintf("%d", res.DeletedCount)
 	}
 
 	//encoding data to json
