@@ -65,7 +65,7 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 
 		returnData.Status = "success"
 		returnData.ID = insertedID
-		returnData.Message = "Order sucseccfully placed. Order id: " + insertedID
+		returnData.Message = "Order successfully placed. Order id: " + insertedID
 	}
 
 	//encoding data to json
