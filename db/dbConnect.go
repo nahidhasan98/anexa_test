@@ -17,7 +17,7 @@ func Connect() (*mongo.Database, context.Context, context.CancelFunc) {
 	dbName := "anexa_test"
 
 	//this is mongoDB atlas connection string
-	connectionString := "mongodb+srv://" + dbUser + ":" + dbPass + "@testcluster.kwwik.gcp.mongodb.net/" + dbName + "?retryWrites=true&w=majority"
+	connectionString := "mongodb+srv://" + dbUser + ":" + dbPass + "@anexacluster.73mtc.mongodb.net/" + dbName + "?retryWrites=true&w=majority"
 
 	dbClient, err := mongo.NewClient(options.Client().ApplyURI(connectionString))
 	if err != nil {
