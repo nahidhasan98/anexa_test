@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 //GetCartInfo func will return all item of the cart with total price
@@ -89,20 +90,35 @@ func AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	//selecting DB collection/table & taking to a variable
 	cartColl := DB.Collection("cart")
 
-	//inserting item (document/row) to DB
-	res, err := cartColl.InsertOne(ctx, item)
+	//setting up options for insert/update
+	opts := options.Update().SetUpsert(true)
+	update := bson.M{
+		"$set": bson.M{
+			"unit":  item.Unit,
+			"price": item.Price,
+			"total": item.Total,
+		},
+	}
+
+	//inserting item (document/row) to DB, if already exist then modify
+	res, err := cartColl.UpdateOne(ctx, bson.M{"code": item.Code}, update, opts)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	//getting inserted id as string from the result of insert query to DB
-	insertedID := res.InsertedID.(primitive.ObjectID).Hex() //type assertion && Calling Hex func
-
 	//preparing data for json response
-	returnData := model.ResponseData{
-		Status:  "success",
-		ID:      insertedID,
-		Message: "Item successfully added to cart. Inserted id: " + insertedID,
+	var returnData model.ResponseData
+
+	if res.MatchedCount == 0 { //new entry for this item
+		//getting inserted id as string from the result of insert query to DB
+		upsertedID := res.UpsertedID.(primitive.ObjectID).Hex() //type assertion && Calling Hex func
+
+		returnData.Status = "success"
+		returnData.ID = upsertedID
+		returnData.Message = "Item successfully added to cart. Inserted id: " + upsertedID
+	} else { //exsisting item, update only
+		returnData.Status = "success"
+		returnData.Message = "Existing item. Item successfully updated in the cart."
 	}
 
 	//encoding data to json
