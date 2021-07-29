@@ -66,6 +66,13 @@ func PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		returnData.Status = "success"
 		returnData.ID = insertedID
 		returnData.Message = "Order successfully placed. Order id: " + insertedID
+
+		//now resetting the cart after making an order
+		//deleting all item(s) (documents/rows) from cart
+		_, err = cartColl.DeleteMany(ctx, bson.M{})
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	//encoding data to json
