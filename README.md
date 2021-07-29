@@ -87,13 +87,22 @@ To add an item to the cart, an HTTP **POST** request should be made at `/api/car
 
 Total price for this item in the cart will be calculated `(total = price * unit)` in backend thus no need to to provide `total` as `json` field.
 
-This api call returns a `json` data as response in the following format:
+This api call returns a `json` data as response in the following format for a new item addition:
 
 ```json
 {
     "status": "success",
     "id": "<a hex encoding objectID>",
     "message": "Item successfully added to cart. Inserted id: <a hex encoding objectID>"
+}
+```
+
+If the item already exist in the cart then response is like:
+
+```json
+{
+    "status": "success",
+    "message": "Existing item. Item successfully updated in the cart."
 }
 ```
 
